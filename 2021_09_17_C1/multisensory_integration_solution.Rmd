@@ -1,0 +1,183 @@
+---
+title: "Class 1 - Multisensory integration"
+author: "Sigrid Agersnap Bom Nielsen"
+date: "15/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) 
+```
+
+```{r}
+pacman::p_load(tidyverse, readbulk)
+```
+
+First of all, you need to download the data from the google drive folder: https://drive.google.com/drive/folders/1JCYyynaXQ4TUxXk0UJhBf7BN_q3sSPWJ 
+
+Hint: you can use read_bulk() from the readbulk package to load the different csv files into one data frame (one df for vision, one for audition)
+
+```{r}
+#loading data
+
+# AUDITION DATA
+data_audition <- read_bulk(
+  directory = 'data_audition/',
+  fun = read_csv
+  )
+
+# VISION DATA
+data_vision <- read_bulk(
+  directory = 'data_vision/',
+          fun = read_csv
+  )
+
+```
+
+
+# Look at the data
+Each row is one trial. RT is measured in milliseconds.
+
+What variables do we have? Which ones are we interested in?
+
+```{r}
+# you can always get a glimpse of the data
+glimpse(data_audition)
+glimpse(data_vision)
+
+############################### CLEANING DATA ##########################
+# AUDITION 
+data_audition <- data_audition %>% 
+  mutate(
+    accuracy = as.factor(accuracy),
+    congruency = as.factor(congruency)
+)
+
+# VISION
+data_vision <- data_vision %>% 
+  mutate(
+    accuracy = as.factor(accuracy),
+    congruency = as.factor(congruency)
+)
+```
+
+Try to make a plot of the mean reaction times per congruency. You might want to remove incorrect trials first.  
+
+```{r}
+############################ REMOVING INCORRECT TRIALS #################################
+# Audition data
+data_audition <- data_audition %>% 
+  filter(accuracy == TRUE)
+
+# Vision data
+data_vision <- data_vision %>% 
+  filter(accuracy == TRUE)
+```
+
+```{r}
+########################## PLOTTING TIME ##################################
+
+################# Boxplots just to get a feel of the data
+
+# AUDITION
+ggplot(data_audition) + 
+  aes(x = congruency, y = rt, fill = congruency) + 
+  geom_boxplot() +
+  theme(legend.position = 'None') +
+  labs(title = 'Audition RT')
+
+
+# VISION
+ggplot(data_vision) + 
+  aes(x = congruency, y = rt, fill = congruency) + 
+  geom_boxplot() +
+  theme(legend.position = 'None') +
+  labs(title = 'Vision RT')
+
+
+################# Mean reaction times with error bars
+
+# Audition
+ggplot(data_audition) + 
+  aes(x = congruency, y = rt, color = congruency) +
+  stat_summary(fun = "mean", geom = "point", size = 3) +
+  stat_summary(fun = 'mean', geom = 'line', color = 'gray55', aes(group = 1)) +
+  stat_summary(fun.data = "mean_se", geom = "errorbar", width = .1) +
+  theme(legend.position = 'None') +
+  labs(title = 'Mean RT of audition with SE errorbars')
+
+# Vision
+ggplot(data_vision) + 
+  aes(x = congruency, y = rt, color = congruency) +
+  stat_summary(fun = "mean", geom = "point", size = 3) +
+  stat_summary(fun = 'mean', geom = 'line', color = 'gray55', aes(group = 1)) +
+  stat_summary(fun.data = "mean_se", geom = "errorbar", width = .1) +
+  theme(legend.position = 'None') +
+  labs(title = 'Mean RT of vision with SE errorbars')
+
+```
+
+
+# CHALLENGE LEVEL 1
+# Accuracy and RT trade off
+Make a graph of accuracy rate. Can you visualize the ratio between reaction times and the percentage of correctly answered trials? Here, we need the incorrect trials as well, so you'll have to reload the data. 
+
+```{r}
+#################### ACCURACY VERSUS CONGRUENCY #################
+# not very interesting plots
+# Audition
+ggplot(data_audition) +
+  aes(x = congruency, y = rt, color = congruency) +
+  stat_summary(fun = 'mean', geom = 'point', size = 2) +
+  facet_wrap(~accuracy) +
+  theme(legend.position = 'None')
+
+
+# Vision
+ggplot(data_vision) +
+  aes(x = congruency, y = rt, color = congruency) +
+  stat_summary(fun = 'mean', geom = 'point', size = 2) +
+  facet_wrap(~accuracy) +
+  theme(legend.position = 'None')
+
+    
+# the number of correct versus incorrect answers
+data_audition %>% count(accuracy, congruency)
+
+
+# TRYING OUT VIOLIN PLOTS
+pacman::p_load(patchwork)
+
+p1 <- data_audition %>% 
+  filter(accuracy == 'TRUE') %>% 
+ggplot() +
+  aes(x = congruency, y = rt, fill = congruency) +
+  geom_violin() +
+  theme(legend.position = 'None')
+
+
+p2 <- data_audition %>% 
+  ggplot() +
+  aes(x = accuracy, y = rt, fill = congruency) +
+  geom_violin() +
+  theme(legend.position = 'None')
+
+
+p1 + p2
+```
+# CHALLENGE LEVEL 2
+# Create linear models
+Does congruency predict the reaction time?
+
+Try making a simple linear model. Here, you should consider removing the incorrect trials again. 
+
+```{r}
+# Audition
+m1 <- lm(rt ~ congruency, data = data_audition)
+summary(m1)
+
+# Vision
+m2 <- lm(rt ~ congruency, data = data_vision)
+summary(m2)
+```
+
