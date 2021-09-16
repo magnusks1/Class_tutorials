@@ -6,25 +6,68 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE) 
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+pacman::p_load(tidyverse, readbulk, patchwork, lmerTest)
 ```
 
-## Including Plots
+Here, we'll try to replicate some cross modal effects.
 
-You can also embed plots, for example:
+First of all, you need to download the data from the google drive folder: https://drive.google.com/drive/folders/1JCYyynaXQ4TUxXk0UJhBf7BN_q3sSPWJ 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+Hint: you can use read_bulk() from the readbulk package to load the different csv files into one dataframe (one df for vision, one for audition). 
+
+If you're up for a challenge you can also write code which loads all the data into one dataframe (there is a column called 'version', which helps to tell the data set apart).
+
+```{r}
+#loading data
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Before you start looking at the data, discuss what predictions you have and why. 
+
+# Investigate the data
+Each row is one trial. RT is measured in milliseconds.
+
+What variables do we have? Which ones are we interested in? Do we need to change the format of some of them?
+
+```{r}
+# get a glimpse of the data
+glimpse(data_audition)
+glimpse(data_vision)
+
+
+```
+
+Try to make a plot of the mean reaction times per congruency. You might want to remove incorrect trials.
+
+Interpret the findings. Do they match your predictions? Why? Why not? 
+
+```{r}
+########################## PLOTTING TIME ##################################
+
+# write your code here
+
+```
+
+# CHALLENGE LEVEL 1 - Modelling time
+Does congruency predict the reaction time?
+
+Try making a simple linear model. Here, you should consider removing the incorrect trials.
+
+```{r}
+
+```
+
+# CHALLENGE LEVEL 2 - Accuracy rate
+Make a graph of accuracy rate. Can you visualize the relationship between congruency and the percentage of incorrectly answered trials per subject?
+
+Discuss the resulting plots. 
+
+```{r}
+
+```
+
+
