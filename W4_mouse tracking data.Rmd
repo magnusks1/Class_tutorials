@@ -1,0 +1,134 @@
+---
+title: "W4_mouse tracking data"
+author: "Magnus K. Sigaard"
+date: "10/15/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Packages
+
+```{r}
+pacman::p_load(mousetrap, dplyr)
+```
+
+# Data
+
+```{r}
+df <- read.csv("subject-3.csv")
+glimpse(df)
+```
+
+## Turning data into mousetrap object
+```{r}
+?mt_import_mousetrap
+mtd <- mt_import_mousetrap(df)
+```
+
+# Plots
+## 2. Basic plot
+```{r}
+mt_plot(mtd)
+```
+This plot shows the mouse path of participants.
+Here, the mouse movements are inverted. 
+
+## Aggregated trajectory plot
+```{r}
+mt_plot_aggregate(mtd)
+```
+**Im not sure how this is to be interpreted**
+
+## Adding rectangles to trajectory plot
+```{r}
+#mt_plot_add_rect(mtd)
+```
+Does not work .. dont know why.
+
+
+
+## Plotting per trajectory
+```{r}
+#mt_plot_per_trajectory(data = mtd)
+```
+
+
+
+## 3. Plotting by trial type
+```{r}
+plot_bytrial <- mt_plot(mtd, color = "trial_type")
+plot_bytrial
+```
+
+## 4. Symmetric plotting
+```{r}
+# Pushing all data to one side
+mtd <- mt_remap_symmetric(mtd,
+                   use = "trajectories",
+                   remap_xpos = "left")
+
+# Plotting it
+mt_plot(mtd, color = "trial_type")
+```
+
+## 5. Timestamp plot
+```{r}
+mt_plot(mtd,
+        x = "timestamps",
+        y = "xpos",
+        use = "trajectories",
+        color = "trial_type")
+```
+The line in the beginning must be the time spent on not moving the mouse? Holding the mouse still.
+After some time, participants start moving their mouses to either the left-hand or right-hand side.
+
+## 6. Removing the initial line
+```{r}
+# Excluding initiations
+mtd <- mt_exclude_initiation(mtd)
+?mt_exclude_initiation
+
+# Plotting
+mt_plot(mtd,
+        x = "timestamps",
+        y = "xpos",
+        use = "trajectories",
+        color = "trial_type")
+```
+
+# 7. Normalizing time data
+```{r}
+mtd_norm <- mt_time_normalize(mtd)
+mtd_norm1 <- mt_time_normalize(mtd, nsteps = 10)
+```
+
+## 8. Plotting normalized data
+```{r}
+mt_plot(mtd_norm1,
+        x = "timestamps",
+        y = "xpos",
+        use = "trajectories",
+        color = "trial_type")
+```
+
+## 9. Changing number of steps
+```{r}
+mtd_norm2 <- mt_time_normalize(mtd, nsteps = 10)
+mt_plot(mtd_norm2,
+        x = "timestamps",
+        y = "xpos",
+        use = "tn_trajectories",
+        color = "trial_type")
+mtd_norm3 <- mt_time_normalize(mtd, nsteps = 100)
+mt_plot(mtd_norm3,
+        x = "timestamps",
+        y = "xpos",
+        use = "tn_trajectories",
+        color = "trial_type")
+```
+We see a more straight curve for the small number of nsteps.
+
+
