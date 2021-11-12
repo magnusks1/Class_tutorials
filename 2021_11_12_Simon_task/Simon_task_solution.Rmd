@@ -14,6 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
 pacman::p_load(tidyverse, wesanderson, lmerTest, readbulk)
 ```
 
+Data can be found here: <https://drive.google.com/drive/folders/18hTvraUiPwxfzCzXl0QNP0Nh5LQK2Oql?usp=sharing>
+
 ```{r}
 # load data
 d <- read_bulk(
