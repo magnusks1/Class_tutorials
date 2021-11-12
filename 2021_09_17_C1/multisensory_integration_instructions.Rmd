@@ -23,7 +23,8 @@ If you're up for a challenge you can also write code which loads all the data in
 
 ```{r}
 #loading data
-
+df_vis <- read_bulk('/Users/magnus.k.sigaard/Google Drev/CogSci/3. semester/Perception and Action/Class/Class_tutorials/2021_09_17_C1/Vision')
+df_aud <- read_bulk('/Users/magnus.k.sigaard/Google Drev/CogSci/3. semester/Perception and Action/Class/Class_tutorials/2021_09_17_C1/Audition') 
 ```
 
 Before you start looking at the data, discuss what predictions you have and why. 
@@ -35,8 +36,8 @@ What variables do we have? Which ones are we interested in? Do we need to change
 
 ```{r}
 # get a glimpse of the data
-glimpse(data_audition)
-glimpse(data_vision)
+glimpse(df_aud)
+glimpse(df_vis)
 
 
 ```
@@ -46,10 +47,96 @@ Try to make a plot of the mean reaction times per congruency. You might want to 
 Interpret the findings. Do they match your predictions? Why? Why not? 
 
 ```{r}
+# Removing incorrect trials
+df_vis <- df_vis %>% filter(accuracy != "false")
+
+# Cleaning
+df_vis <- df_vis %>% 
+  mutate(
+    accuracy = as.factor(accuracy),
+    congruency = as.factor(congruency),
+    subject = as.factor(subject))
+
 ########################## PLOTTING TIME ##################################
 
-# write your code here
+df_vis %>%
+  ggplot(aes(congruency, rt))+
+  geom_boxplot()
 
+df_vis %>%
+  ggplot(aes(congruency, rt))+
+  stat_summary(fun = "mean", geom = "point")+
+  stat_summary(fun = "sd", geom = "line")
+
+
+## ########################### Sigrids solution
+
+# AUDITION
+data_audition %>% 
+  filter(accuracy == 'TRUE') %>% 
+  ggplot() +
+  aes(x = congruency, y = rt, fill = congruency) + 
+  geom_boxplot() +
+  theme(legend.position = 'None') +
+  labs(title = 'Audition RT')
+
+# VISION
+data_vision %>% 
+  filter(accuracy == 'TRUE') %>% 
+  ggplot() + 
+  aes(x = congruency, y = rt, fill = congruency) + 
+  geom_boxplot() +
+  theme(legend.position = 'None') +
+  labs(title = 'Vision RT')
+
+
+################# Mean reaction times with error bars
+
+# Audition
+data_audition %>% 
+  filter(accuracy == 'TRUE') %>% 
+  ggplot() +
+  aes(x = congruency, y = rt, color = congruency) +
+  stat_summary(fun = "mean", geom = "point", size = 3) +
+  stat_summary(fun = 'mean', geom = 'line', color = 'gray55', aes(group = 1)) +
+  stat_summary(fun.data = "mean_se", geom = "errorbar", width = .1) +
+  theme(legend.position = 'None') +
+  labs(title = 'Mean RT of audition with SE errorbars')
+
+# Vision
+data_vision %>% 
+  filter(accuracy == 'TRUE') %>% 
+  ggplot() +
+  aes(x = congruency, y = rt, color = congruency) +
+  stat_summary(fun = "mean", geom = "point", size = 3) +
+  stat_summary(fun = 'mean', geom = 'line', color = 'gray55', aes(group = 1)) +
+  stat_summary(fun.data = "mean_se", geom = "errorbar", width = .1) +
+  theme(legend.position = 'None') +
+  labs(title = 'Mean RT of vision with SE errorbars')
+
+
+################### Mean RT per subject
+### RT per subject - vision
+plot_rt_vis <- data_vision %>% 
+   group_by(subject, congruency) %>% 
+   filter(accuracy == 'TRUE') %>%
+   summarize(mean_rt = mean(rt)) %>%
+  ggplot() + 
+  aes(x=congruency, y=mean_rt, color=subject) + 
+  geom_point() + 
+  geom_line(aes(group=subject))
+
+### RT per subject - audition
+plot_rt_aud <- data_audition %>% 
+   group_by(subject, congruency) %>% 
+   filter(accuracy == 'TRUE') %>%
+   summarize(mean_rt = mean(rt)) %>%
+  ggplot() + 
+  aes(x=congruency, y=mean_rt, color=subject) + 
+  geom_point() + 
+  geom_line(aes(group=subject))
+
+plot_rt_vis + plot_rt_aud
 ```
 
 # CHALLENGE LEVEL 1 - Modelling time
