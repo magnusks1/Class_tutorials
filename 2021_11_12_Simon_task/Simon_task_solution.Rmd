@@ -98,7 +98,8 @@ d %>%
   geom_bar() + 
   facet_grid(~ congruency) +
   scale_fill_manual(values = pal) +
-  labs(title = 'Accuracy for each congruency')
+  labs(title = 'Accuracy for each congruency') + 
+  theme(legend.position = 'NULL')
 ```
 
 # Challenge level 1: Modelling time
