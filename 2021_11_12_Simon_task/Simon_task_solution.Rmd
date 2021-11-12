@@ -1,0 +1,125 @@
+---
+title: "Simon Task"
+author: "Sigrid Agersnap Bom Nielsen"
+date: "8/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# load packages
+pacman::p_load(tidyverse, wesanderson, lmerTest, readbulk)
+```
+
+Data can be found here: <https://drive.google.com/drive/folders/18hTvraUiPwxfzCzXl0QNP0Nh5LQK2Oql?usp=sharing>
+
+```{r}
+# load data
+d <- read_bulk(
+  directory = 'data/',
+  fun = read_csv
+  )
+```
+
+# Getting to know the data
+First, take a look at the data. Which columns do we have? Which ones do we need to examine if there is in fact a Simon Task effect? 
+
+```{r}
+glimpse(d)
+```
+
+# Creating a congruency column 
+In order to examine the data, we need to create a congruency column, which indicates whether the trial in question is congruent, incongruent or neutral. 
+
+Hint: you can do this by making a ifelse statement using the existing columns 'color' and 'position'. 
+
+```{r}
+d <- d %>% 
+  mutate(
+    congruency = ifelse(
+      color == 'green' & position == 'left' | color == 'red' & position == 'right', 'congruent', 'incongruent'),
+    congruency = ifelse(position == 'middle', 'neutral', congruency),
+    congruency = as.factor(congruency),
+    accuracy = as.factor(accuracy)
+  )
+```
+
+# Removing 'training' trials
+
+```{r}
+# we only want the test trials 
+d <- d %>% 
+  filter(
+    part == 'test'
+    )
+```
+
+# Plotting time! 
+- Visualize the mean RT of each congruency category with SE error bars (you might want to remove incorrect trials for this one).
+
+```{r}
+# getting a nice Wes Anderson color palette
+
+# I like this one
+wes_palette('Darjeeling1')
+
+# save it in a variable to be used when plotting
+pal <- wes_palettes$Darjeeling1
+```
+
+```{r}
+################ plotting mean RT with SE errorbars
+d %>% 
+  filter(
+    accuracy == 'TRUE'
+    ) %>% 
+ggplot() + 
+  aes(x = congruency, y = rt, color = congruency) +
+  # creating the geom points of the mean rt of  each congruency
+  stat_summary(fun = "mean", geom = "point", size = 3, color = pal[1:3]) +
+  # adding the error bars
+  stat_summary(fun.data = "mean_se", geom = "errorbar", width = .1, color = pal[1:3]) +
+  # adding the connecting line between the points 
+  stat_summary(fun = 'mean', geom = 'line', color = pal[5], aes(group = 1)) +
+  theme(legend.position = 'None') +
+  labs(title = 'Mean RT of the Simon Task with SE errorbars')
+
+```
+- Visualize the accuracy for each congruency
+
+```{r}
+############### Plotting accuracy and congruency
+d %>% 
+  ggplot() +
+  aes(accuracy, fill = congruency) + 
+  geom_bar() + 
+  facet_grid(~ congruency) +
+  scale_fill_manual(values = pal) +
+  labs(title = 'Accuracy for each congruency') + 
+  theme(legend.position = 'NULL')
+```
+
+# Challenge level 1: Modelling time
+
+ - Does congruency predict the reaction time? 
+ 
+```{r}
+# as you guys are very smart and know about the possible pitfalls of using p-values, we'll make a simple model using the much discussed p-values
+m1 <- lmerTest::lmer(rt ~ congruency + (1|subject), d)
+summary(m1)
+```
+
+- Does congruency predict accuracy? 
+
+```{r}
+# this time we have a logistic regression with random effects, why the glmer() is being used
+m2 <- glmer(accuracy ~ congruency + (1 | subject), data = d, family = binomial)
+summary(m2)
+```
+
+# Challenge level 2: Play with palettes 
+Go back to your plot and try to change the colors using a specific palette, e.g. a palette from the wesanderson package. 
+Make your plots look their best ;-)

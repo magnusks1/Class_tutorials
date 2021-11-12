@@ -1,0 +1,71 @@
+---
+title: "Simon Task"
+author: "Sigrid Agersnap Bom Nielsen"
+date: "8/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# load packages
+pacman::p_load(...)
+```
+
+Data can be found here: <https://drive.google.com/drive/folders/18hTvraUiPwxfzCzXl0QNP0Nh5LQK2Oql?usp=sharing>
+
+```{r}
+# load data
+```
+
+# Getting to know the data
+First, take a look at the data. Which columns do we have? Which ones do we need to examine if there is in fact a Simon Task effect? 
+
+```{r}
+```
+
+# Creating a congruency column 
+In order to examine the data, we need to create a congruency column, which indicates whether the trial in question is congruent, incongruent or neutral. 
+
+Hint: you can do this by making a ifelse statement using the existing columns 'color' and 'position'. 
+
+```{r}
+```
+
+# Removing 'training' trials
+
+```{r}
+```
+
+# Plotting time! 
+- Visualize the mean RT of each congruency category with SE error bars (you might want to remove incorrect trials for this one).
+
+```{r}
+
+```
+
+- Visualize the accuracy for each congruency
+
+```{r}
+
+```
+
+# Challenge level 1: Modelling time
+
+ - Does congruency predict the reaction time? 
+ 
+```{r}
+
+```
+
+- Does congruency predict accuracy? 
+
+```{r}
+
+```
+
+# Challenge level 2: Play with palettes 
+Go back to your plot and try to change the colors using a specific palette, e.g. a palette from the wesanderson package. 
+Make your plots look their best ;-)
